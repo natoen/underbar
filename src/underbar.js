@@ -77,9 +77,9 @@
   _.filter = function(collection, test) {
     var result = [];
 
-    _.each(collection, function(value, prop, collection) {
-      if (test(value, prop, collection))
-        result.push(value);
+    _.each(collection, function(element, prop, collection) {
+      if (test(element, prop, collection))
+        result.push(element);
     });
 
     return result;
@@ -89,13 +89,14 @@
   _.reject = function(collection, test) {
     // TIP: see if you can re-use _.filter() here, without simply
     // copying code in and modifying it
-    return _.filter(collection, function(value, prop, collection) {
-      return !test(value, prop, collection);
+    return _.filter(collection, function(element, prop, collection) {
+      return !test(element, prop, collection);
     });
   };
 
   // Produce a duplicate-free version of the array.
   _.uniq = function(array) {
+    uniqArray = 
   };
 
 
