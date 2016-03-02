@@ -353,7 +353,12 @@
 
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
-  _.invoke = function(collection, functionOrKey, args) {
+  _.invoke = function(collection, functionOrKey, otherArgs) {
+    var func = typeof functionOrKey === 'function';
+
+    return _.map(collection, function(element) {
+      return func ? functionOrKey.apply(element, otherArgs) : element[functionOrKey]();
+    });
   };
 
   // Sort the object's values by a criterion produced by an iterator.
@@ -361,6 +366,22 @@
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    var func = typeof iterator === 'function';
+
+    return collection.sort(function(a, b) {
+      if (func) {
+        a = iterator(a), b = iterator(b);
+      } else {
+        a = a[iterator], b = b[iterator];
+      }
+
+      if (a < b) 
+        return -1;
+      else if (a > b)
+        return 1;
+      else
+        return 0;
+    });
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -369,6 +390,29 @@
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var first = true;
+
+    return _.reduce(arguments, function(accumulator, element) {
+      if (accumulator.length < element.length) 
+        var len = element.length;
+      else
+        var len = accumulator.length;
+
+      if (first) {
+        var firstAccumulator = []; 
+        first = false;
+
+        for (var i = 0; i < len; i++)
+          firstAccumulator.push(new Array(accumulator[i], element[i]));
+
+        return firstAccumulator;
+      }
+
+      for (var i = 0; i < len; i++)
+        accumulator[i].push(element[i]);
+
+      return accumulator;
+    });
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
@@ -399,7 +443,7 @@
     return function() {
       if ((new Date()).getTime() > cooldown) {
         cooldown = (new Date()).getTime() + wait;
-        
+
         return func.apply(this, arguments);
       }
     };
