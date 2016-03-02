@@ -245,7 +245,7 @@
   _.defaults = function(obj) {
     for (var i = 1; i < arguments.length; i++) {
       for (var prop in arguments[i]) {
-        if (prop in arguments[0])
+        if (!(prop in arguments[0]))
           arguments[0][prop] = arguments[i][prop]; 
       }
     }
@@ -311,6 +311,11 @@
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait) {
+    var parameters = Array.prototype.slice.call(arguments, 2);
+
+    return setTimeout(function() {
+      func.apply(this, parameters);
+    }, wait);
   };
 
 
@@ -325,6 +330,16 @@
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
   _.shuffle = function(array) {
+    var shuffledArray = array.slice();
+
+    for (var i = shuffledArray.length; i > 0; i--) {
+      var r = Math.floor(Math.random() * i);
+      var temp = shuffledArray[i-1];
+      shuffledArray[i-1] = shuffledArray[r];
+      shuffledArray[r] = temp; 
+    }
+
+    return shuffledArray;
   };
 
 
@@ -379,5 +394,14 @@
   //
   // Note: This is difficult! It may take a while to implement.
   _.throttle = function(func, wait) {
+    var cooldown = (new Date()).getTime();
+
+    return function() {
+      if ((new Date()).getTime() > cooldown) {
+        cooldown = (new Date()).getTime() + wait;
+        
+        return func.apply(this, arguments);
+      }
+    };
   };
 }());
