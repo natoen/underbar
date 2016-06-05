@@ -3,29 +3,23 @@
   <head>
     <title>Underbar Test Suite</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <link rel="stylesheet" href="lib/css/mocha.css" />
-    <script src="lib/chai.js"></script>
-    <script src="lib/mocha.js"></script>
-    <script src="lib/sinon.js"></script>
-    <script src="lib/sinon-chai.js"></script>
-    <script src="lib/cardboard.js"></script>
-    <script src="lib/testSupport.js"></script>
+    <link rel="stylesheet" href="dist/mocha.min.css" />
 
     <!-- Source files -->
-    <script src="src/underbar.js"></script>
+    <script src="dist/underbar.min.js"></script>
     <!-- End source files -->
 
     <!-- Test files -->
     <script>
-          var clock;
+      let clock;
 
-          before(function() {
-            clock = sinon.useFakeTimers();
-          });
+      before(() => {
+        clock = sinon.useFakeTimers();
+      });
 
-          after(function() {
-            clock.restore();
-          });
+      after(() => {
+        clock.restore();
+      });
     </script>
     <script src="spec/part1.js"></script>
     <script src="spec/part2.js"></script>
