@@ -112,12 +112,12 @@
   //     return total + number * number;
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
-  _.reduce = (collection, iterator, accumulator) => {
-    let firstElement = accumulator;
+  _.reduce = (collection, iterator, initialValue) => {
+    let firstElement = initialValue;
     let reduced;
 
     _.each(collection, (element) => {
-      if (firstElement === undefined) {
+      if (!firstElement) {
         reduced = element;
         firstElement = true;
       } else {
@@ -130,13 +130,9 @@
 
   // Determine if the array or object contains a given value (using `===`).
   _.contains = (collection, target) =>
-    _.reduce(collection, (wasFound, item) => {
-      if (wasFound) {
-        return true;
-      }
-
-      return item === target;
-    }, false);
+    _.reduce(collection, (wasFound, element) =>
+      wasFound || (element === target)
+    , false);
 
 
   // Determine whether all of the elements match a truth test.
@@ -187,13 +183,15 @@
   //   }, {
   //     bla: "even more stuff"
   //   }); // obj1 now contains key1, key2, key3 and bla
-  _.extend = function(obj) {
-    for (var i = 1; i < arguments.length; i++) {
-      for (var prop in arguments[i])
-        arguments[0][prop] = arguments[i][prop]; 
+  _.extend = (...collection) => {
+    for (let i = 1; i < collection.length; i++) {
+      const props = Object.keys(collection[i]);
+      for (let j = 0; j < props.length; j++) {
+        collection[0][props[j]] = collection[j][props[j]];
+      }
     }
 
-    return arguments[0];
+    return collection[0];
   };
 
   // Like extend, but doesn't ever overwrite a key that already
