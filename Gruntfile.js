@@ -8,7 +8,7 @@ module.exports = (grunt) => {
       ],
       options: {
         force: 'true',
-        eslintrc: '.eslintrc',
+        eslintrc: '.eslintrc.js',
         ignores: [],
       },
     },
@@ -73,7 +73,7 @@ module.exports = (grunt) => {
 
     shell: {
       removeFiles: {
-        command: 'rm ./src/concat.js ./src/transpiledUnderbar.*',
+        command: 'rm src/concat.js ./src/transpiledUnderbar.js',
         options: {
           stdout: true,
           stderr: true,
@@ -85,12 +85,10 @@ module.exports = (grunt) => {
     watch: {
       scripts: {
         files: [
-          'public/client/**/*.js',
-          'public/lib/**/*.js',
+          'src/underbar.js',
         ],
         tasks: [
-          'concat',
-          'uglify',
+          'eslint',
         ],
       },
     },
@@ -105,7 +103,5 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('default', ['eslint', 'concat', 'uglify', 'cssmin']);
-  grunt.registerTask('test', ['eslint', 'mocha']);
-  grunt.registerTask('build', ['babel', 'concat', 'cssmin', 'uglify', 'shell:removeFiles']);
+  grunt.registerTask('build', ['eslint', 'babel', 'mocha', 'concat', 'uglify', 'cssmin', 'shell:removeFiles']);
 };
