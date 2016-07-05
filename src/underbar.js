@@ -199,8 +199,9 @@
   _.defaults = function(obj) {
     for (var i = 1; i < arguments.length; i++) {
       for (var prop in arguments[i]) {
-        if (!(prop in arguments[0]))
+        if (!(prop in arguments[0])) {
           arguments[0][prop] = arguments[i][prop]; 
+        }
       }
     }
 
@@ -251,10 +252,11 @@
     var storage = {};
 
     return function(key) {
-      if (key in storage)
+      if (key in storage) {
         return storage[key];
-      else
+      } else {
         return storage[key] = func.apply(this, arguments);
+      }
     };
   };
 
@@ -288,8 +290,8 @@
 
     for (var i = shuffledArray.length; i > 0; i--) {
       var r = Math.floor(Math.random() * i);
-      var temp = shuffledArray[i-1];
-      shuffledArray[i-1] = shuffledArray[r];
+      var temp = shuffledArray[i - 1];
+      shuffledArray[i - 1] = shuffledArray[r];
       shuffledArray[r] = temp; 
     }
 
@@ -329,12 +331,13 @@
         a = a[iterator], b = b[iterator];
       }
 
-      if (a < b) 
+      if (a < b) {
         return -1;
-      else if (a > b)
+      } else if (a > b) {
         return 1;
-      else
+      } else {
         return 0;
+      }
     });
   };
 
@@ -347,23 +350,26 @@
     var first = true;
 
     return _.reduce(arguments, function(accumulator, element) {
-      if (accumulator.length < element.length) 
+      if (accumulator.length < element.length) {
         var len = element.length;
-      else
+      } else {
         var len = accumulator.length;
+      }
 
       if (first) {
         var firstAccumulator = []; 
         first = false;
 
-        for (var i = 0; i < len; i++)
+        for (var i = 0; i < len; i++) {
           firstAccumulator.push(new Array(accumulator[i], element[i]));
+        }
 
         return firstAccumulator;
       }
 
-      for (var i = 0; i < len; i++)
+      for (var i = 0; i < len; i++) {
         accumulator[i].push(element[i]);
+      }
 
       return accumulator;
     });
