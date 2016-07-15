@@ -1,16 +1,14 @@
 (() => {
-  window._ = {};
-  const _ = window._;
+  const _ = window._ = {};
+
   // returns input value
-  _.identity = (val) =>
-    val;
+  _.identity = (val) => val;
 
   // returns first element(s)
-  _.first = (array, n) =>
-    (n === undefined ? array[0] : array.slice(0, n));
+  _.first = (array, n) => (n === undefined ? array[0] : array.slice(0, n));
 
   // returns last element(s)
-  _.last = (array, n) =>
+  _.last = (array, n) => 
     (n === undefined ? array[array.length - 1] : array.slice(Math.max(0, array.length - n)));
 
   // iterate through the collection and executes the callback on each element
@@ -20,6 +18,7 @@
         iterator(collection[i], i, collection);
       }
     } else {
+      // we only care about its own non-inherited
       const props = Object.keys(collection);
 
       for (let i = 0; i < props.length; i++) {
@@ -56,8 +55,7 @@
 
   // Return all elements of an array that don't pass a truth test.
   _.reject = (collection, test) =>
-    _.filter(collection, (element, prop, object) =>
-      (!test(element, prop, object)));
+    _.filter(collection, (element, prop, object) => (!test(element, prop, object)));
 
   // Produce a duplicate-free version of the array.
   _.uniq = (array) => {
@@ -86,11 +84,9 @@
   };
 
   // Takes an array of objects and returns and array of the values of
-  // a certain property in it. E.g. take an array of people and return
+  // a certain property in it. E.g. take a collection of people and return
   // an array of just their ages
-  _.pluck = (collection, key) =>
-     _.map(collection, (element) =>
-       element[key]);
+  _.pluck = (collection, key) => _.map(collection, (element) => element[key]);
 
   // Reduces an array or object to a single value by repetitively calling
   // iterator(accumulator, item) for each item. accumulator should be
@@ -113,19 +109,15 @@
   //   }); // should be 5, regardless of the iterator function passed in
   //          No accumulator is given so the first element is used.
   _.reduce = (collection, iterator, initialValue) => {
-    let firstElement = initialValue;
-    let reduced;
-
     _.each(collection, (element) => {
-      if (!firstElement) {
-        reduced = element;
-        firstElement = true;
+      if (initialValue === undefined) {
+        initialValue = element;
       } else {
-        reduced = iterator(reduced, element);
+        initialValue = iterator(initialValue, element);
       }
     });
 
-    return reduced;
+    return initialValue;
   };
 
   // Determine if the array or object contains a given value (using `===`).
@@ -136,18 +128,8 @@
 
 
   // Determine whether all of the elements match a truth test.
-  _.every = (collection, iterator) => {
-    let callback;
-    if (!iterator) {
-      callback = _.identity;
-    } else {
-      callback = iterator;
-    }
-
-    return !!_.reduce(collection, (accumulator, element) =>
-      (accumulator && callback(element))
-    , true);
-  };
+  _.every = (collection, iterator = _.identity) =>
+    !!_.reduce(collection, (accumulator, element) => !!(accumulator && iterator(element)), true);
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
@@ -379,17 +361,44 @@
   // The new array should contain all elements of the multidimensional array.
   //
   // Hint: Use Array.isArray to check if something is an array
-  _.flatten = function(nestedArray, result) {
+  _.flatten = function(nestedArray) {
+    let result = [];
+
+    for (let i = 0; i < nestedArray.length; i++) {
+      if (Array.isArray(nestedArray[i])) {
+        result = result.concat(_.flatten(nestedArray[i]));
+      } else {
+        result.push(nestedArray[i]);
+      }
+    }
+
+    return result;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
-  _.intersection = function() {
+  _.intersection = function(...arrays) {
+    let result = arrays[0];
+
+    for (let i = 1; i < arrays.length; i++) {
+      const temp = [];
+
+      for (let j = 0; j < result.length; j++) {
+        if (arrays[i].indexOf(result[j]) > -1) {
+          temp.push(result[j]);
+        } 
+      }
+
+      result = temp;
+    }
+
+    return result;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
