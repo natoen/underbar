@@ -13,18 +13,6 @@ module.exports = (grunt) => {
       },
     },
 
-    babel: {
-      options: {
-        sourceMap: true,
-        presets: ['es2015'],
-      },
-      dist: {
-        files: {
-          'dist/transpiledUnderbar.js': 'src/underbar.js',
-        },
-      },
-    },
-
     concat: {
       options: {
         separator: ';',
@@ -64,7 +52,7 @@ module.exports = (grunt) => {
 
     shell: {
       removeFiles: {
-        command: 'rm src/concatLib.js dist/transpiledUnderbar.js.map',
+        command: 'rm src/concatLib.js',
         options: {
           stdout: true,
           stderr: true,
@@ -93,5 +81,5 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('build', ['eslint', 'babel', 'concat', 'uglify', 'cssmin', 'shell:removeFiles']);
+  grunt.registerTask('build', ['eslint', 'concat', 'uglify', 'cssmin', 'shell:removeFiles']);
 };

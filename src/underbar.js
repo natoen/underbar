@@ -378,21 +378,19 @@
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function(...arrays) {
-    let result = arrays[0];
-
     for (let i = 1; i < arrays.length; i++) {
       const temp = [];
 
-      for (let j = 0; j < result.length; j++) {
-        if (arrays[i].indexOf(result[j]) > -1) {
-          temp.push(result[j]);
+      for (let j = 0; j < arrays[0].length; j++) {
+        if (_.indexOf(arrays[i], arrays[0][j]) > -1) {
+          temp.push(arrays[0][j]);
         } 
       }
 
-      result = temp;
+      arrays[0] = temp;
     }
 
-    return result;
+    return arrays[0];
   };
 
   // Take the difference between one array and a number of other arrays.
