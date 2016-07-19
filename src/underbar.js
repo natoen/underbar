@@ -395,8 +395,20 @@
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
-  _.difference = function(array) {
-    
+  _.difference = (...arrays) => {
+    for (let i = 1; i < arrays.length; i++) {
+      const temp = [];
+
+      for (let j = 0; j < arrays[0].length; j++) {
+        if (_.indexOf(arrays[i], arrays[0][j]) < 0) {
+          temp.push(arrays[0][j]);
+        } 
+      }
+
+      arrays[0] = temp;
+    }
+
+    return arrays[0];
   };
 
   // Returns a function, that, when invoked, will only be triggered at most once
@@ -404,14 +416,14 @@
   // on this function.
   //
   // Note: This is difficult! It may take a while to implement.
-  _.throttle = function(func, wait) {
-    var cooldown = (new Date()).getTime();
+  _.throttle = (func, wait) => {
+    let cooldown = (new Date()).getTime();
 
-    return function() {
+    return (...parameters) => {
       if ((new Date()).getTime() > cooldown) {
         cooldown = (new Date()).getTime() + wait;
 
-        return func.apply(this, arguments);
+        return func.apply(null, parameters);
       }
     };
   };
