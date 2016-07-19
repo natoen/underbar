@@ -4,21 +4,12 @@ module.exports = (grunt) => {
 
     eslint: {
       target: [
-        'src/*.js',
+        'src/underbar.js',
       ],
       options: {
         force: 'true',
         eslintrc: '.eslintrc.js',
         ignores: [],
-      },
-    },
-
-    mocha: {
-      test: {
-        options: {
-          reporter: 'spec',
-        },
-        src: ['spec/*.js'],
       },
     },
 
@@ -29,7 +20,7 @@ module.exports = (grunt) => {
       },
       dist: {
         files: {
-          'src/transpiledUnderbar.js': 'src/underbar.js',
+          'dist/transpiledUnderbar.js': 'src/underbar.js',
         },
       },
     },
@@ -40,8 +31,8 @@ module.exports = (grunt) => {
       },
       dist: {
         src: ['lib/chai.js', 'lib/mocha.js', 'lib/sinon.js', 'lib/sinon-chai.js',
-              'lib/cardboard.js', 'lib/testSupport.js', 'src/transpiledUnderbar.js'],
-        dest: 'src/concat.js',
+              'lib/cardboard.js', 'lib/testSupport.js'],
+        dest: 'src/concatLib.js',
       },
     },
 
@@ -51,7 +42,7 @@ module.exports = (grunt) => {
       },
       dist: {
         files: {
-          'dist/<%= pkg.name %>.min.js': ['<%= concat.dist.dest %>'],
+          'dist/lib.min.js': ['<%= concat.dist.dest %>'],
         },
       },
     },
@@ -73,7 +64,7 @@ module.exports = (grunt) => {
 
     shell: {
       removeFiles: {
-        command: 'rm src/concat.js ./src/transpiledUnderbar.js',
+        command: 'rm src/concatLib.js dist/transpiledUnderbar.js.map',
         options: {
           stdout: true,
           stderr: true,
@@ -88,14 +79,13 @@ module.exports = (grunt) => {
           'src/underbar.js',
         ],
         tasks: [
-          'eslint',
+          'build',
         ],
       },
     },
   });
 
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-mocha');
   grunt.loadNpmTasks('grunt-babel');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-concat');
@@ -103,5 +93,5 @@ module.exports = (grunt) => {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('build', ['eslint', 'babel', 'mocha', 'concat', 'uglify', 'cssmin', 'shell:removeFiles']);
+  grunt.registerTask('build', ['eslint', 'babel', 'concat', 'uglify', 'cssmin', 'shell:removeFiles']);
 };
