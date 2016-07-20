@@ -20,7 +20,7 @@ module.exports = (grunt) => {
       dist: {
         src: ['lib/chai.js', 'lib/mocha.js', 'lib/sinon.js', 'lib/sinon-chai.js',
               'lib/cardboard.js', 'lib/testSupport.js'],
-        dest: 'src/concatLib.js',
+        dest: 'lib/lib.concat.js',
       },
     },
 
@@ -30,7 +30,7 @@ module.exports = (grunt) => {
       },
       dist: {
         files: {
-          'dist/lib.min.js': ['<%= concat.dist.dest %>'],
+          'lib/lib.min.js': ['<%= concat.dist.dest %>'],
         },
       },
     },
@@ -44,7 +44,7 @@ module.exports = (grunt) => {
           expand: true,
           cwd: 'lib/css',
           src: ['mocha.css'],
-          dest: 'dist',
+          dest: 'lib/css',
           ext: '.min.css',
         }],
       },
@@ -52,7 +52,7 @@ module.exports = (grunt) => {
 
     shell: {
       removeFiles: {
-        command: 'rm src/concatLib.js',
+        command: 'rm lib/lib.concat.js',
         options: {
           stdout: true,
           stderr: true,
@@ -67,19 +67,18 @@ module.exports = (grunt) => {
           'src/underbar.js',
         ],
         tasks: [
-          'build',
+          'eslint',
         ],
       },
     },
   });
 
   grunt.loadNpmTasks('grunt-eslint');
-  grunt.loadNpmTasks('grunt-babel');
-  grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-contrib-watch');
 
-  grunt.registerTask('build', ['eslint', 'concat', 'uglify', 'cssmin', 'shell:removeFiles']);
+  grunt.registerTask('build', ['concat', 'uglify', 'cssmin', 'shell:removeFiles']);
 };
