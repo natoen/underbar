@@ -1,5 +1,5 @@
 (() => {
-  const _ = window._ = {};
+  window._ = {};
 
   // returns input value
   _.identity = (val) => val;
@@ -133,18 +133,8 @@
 
   // Determine whether any of the elements pass a truth test. If no iterator is
   // provided, provide a default one
-  _.some = (collection, iterator) => {
-    let callback;
-    if (!iterator) {
-      callback = _.identity;
-    } else {
-      callback = iterator;
-    }
-
-    return !!_.reduce(collection, (accumulator, element) =>
-      (accumulator || callback(element))
-    , false);
-  };
+  _.some = (collection, iterator = _.identity) => 
+    !!_.reduce(collection, (accumulator, element) => !!(accumulator || iterator(element)), false);
 
 
   /**
@@ -168,8 +158,9 @@
   _.extend = (...collection) => {
     for (let i = 1; i < collection.length; i++) {
       const props = Object.keys(collection[i]);
+
       for (let j = 0; j < props.length; j++) {
-        collection[0][props[j]] = collection[j][props[j]];
+        collection[0][props[j]] = collection[i][props[j]];
       }
     }
 
@@ -178,16 +169,18 @@
 
   // Like extend, but doesn't ever overwrite a key that already
   // exists in obj
-  _.defaults = function(obj) {
-    for (var i = 1; i < arguments.length; i++) {
-      for (var prop in arguments[i]) {
-        if (!(prop in arguments[0])) {
-          arguments[0][prop] = arguments[i][prop]; 
+  _.defaults = (...objects) => {
+    for (let i = 1; i < objects.length; i++) {
+      const props = Object.keys(objects[i]);
+
+      for (let j = 0; j < props.length; j++) {
+        if (!(props[j] in objects[0])) {
+          objects[0][props[j]] = objects[i][props[j]]; 
         }
       }
     }
 
-    return arguments[0];
+    return objects[0];
   };
 
 
@@ -210,11 +203,11 @@
 
     // TIP: We'll return a new function that delegates to the old one, but only
     // if it hasn't been called before.
-    return function() {
+    return (...parameters) => {
       if (!alreadyCalled) {
         // TIP: .apply(this, arguments) is the standard way to pass on all of the
         // infromation from one function call to another.
-        result = func.apply(this, arguments);
+        result = func.apply(this, parameters);
         alreadyCalled = true;
       }
       // The new function always returns the originally computed result.
@@ -230,14 +223,14 @@
   // _.memoize should return a function that, when called, will check if it has
   // already computed the result for the given argument and return that value
   // instead if possible.
-  _.memoize = function(func) {
-    var storage = {};
+  _.memoize = (func) => {
+    const storage = {};
 
-    return function(key) {
+    return (...key) => {
       if (key in storage) {
         return storage[key];
       } else {
-        return storage[key] = func.apply(this, arguments);
+        return storage[key] = func.apply(this, key);
       }
     };
   };
@@ -248,13 +241,8 @@
   // The arguments for the original function are passed after the wait
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
-  _.delay = function(func, wait) {
-    var parameters = Array.prototype.slice.call(arguments, 2);
-
-    return setTimeout(function() {
-      func.apply(this, parameters);
-    }, wait);
-  };
+  _.delay = (func, wait, ...parameters) => 
+    setTimeout(()　=> { func.apply(this, parameters); }, wait);
 
 
   /**
@@ -267,17 +255,18 @@
   // TIP: This function's test suite will ask that you not modify the original
   // input array. For a tip on how to make a copy of an array, see:
   // http://mdn.io/Array.prototype.slice
-  _.shuffle = function(array) {
-    var shuffledArray = array.slice();
+  _.shuffle = (array) => {
+    const newArray = array.slice();
 
-    for (var i = shuffledArray.length; i > 0; i--) {
-      var r = Math.floor(Math.random() * i);
-      var temp = shuffledArray[i - 1];
-      shuffledArray[i - 1] = shuffledArray[r];
-      shuffledArray[r] = temp; 
+    for (let i = newArray.length - 1; i > -1; i--) {
+      const r = Math.floor(Math.random() * i);
+      const temp = newArray[i];
+
+      newArray[i] = newArray[r];
+      newArray[r] = temp; 
     }
 
-    return shuffledArray;
+    return newArray;
   };
 
 
@@ -291,23 +280,18 @@
 
   // Calls the method named by functionOrKey on each value in the list.
   // Note: You will need to learn a bit about .apply to complete this.
-  _.invoke = function(collection, functionOrKey, otherArgs) {
-    var func = typeof functionOrKey === 'function';
-
-    return _.map(collection, function(element) {
-      return func ? functionOrKey.apply(element, otherArgs) : element[functionOrKey]();
-    });
-  };
+  _.invoke = (collection, funcOrKey, ...otherArgs) =>
+    _.map(collection, (element) =>
+      typeof funcOrKey === 'function' ? funcOrKey.apply(element, otherArgs) : element[funcOrKey]()
+    );
 
   // Sort the object's values by a criterion produced by an iterator.
   // If iterator is a string, sort objects by that property with the name
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
-  _.sortBy = function(collection, iterator) {
-    var func = typeof iterator === 'function';
-
-    return collection.sort(function(a, b) {
-      if (func) {
+  _.sortBy = (collection, iterator) =>
+    collection.sort((a, b) => {
+      if (typeof iterator === 'function') {
         a = iterator(a), b = iterator(b);
       } else {
         a = a[iterator], b = b[iterator];
@@ -321,47 +305,32 @@
         return 0;
       }
     });
-  };
 
   // Zip together two or more arrays with elements of the same index
   // going together.
   //
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
-  _.zip = function() {
-    var first = true;
+  _.zip = (...arrays) =>
+    _.reduce(arrays, (accumulator, element) => {
+      const len = accumulator.length > element.length ? accumulator.length : element.length;
 
-    return _.reduce(arguments, function(accumulator, element) {
-      if (accumulator.length < element.length) {
-        var len = element.length;
-      } else {
-        var len = accumulator.length;
-      }
-
-      if (first) {
-        var firstAccumulator = []; 
-        first = false;
-
-        for (var i = 0; i < len; i++) {
-          firstAccumulator.push(new Array(accumulator[i], element[i]));
+      for (let i = 0; i < len; i++) {
+        if (Array.isArray(accumulator[i])) {
+          accumulator[i].push(element[i]);
+        } else {
+          accumulator[i] = [element[i]];
         }
-
-        return firstAccumulator;
-      }
-
-      for (var i = 0; i < len; i++) {
-        accumulator[i].push(element[i]);
       }
 
       return accumulator;
-    });
-  };
+    }, []);
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
   // The new array should contain all elements of the multidimensional array.
   //
   // Hint: Use Array.isArray to check if something is an array
-  _.flatten = function(nestedArray) {
+  _.flatten = (nestedArray) => {
     let result = [];
 
     for (let i = 0; i < nestedArray.length; i++) {
@@ -377,7 +346,7 @@
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
-  _.intersection = function(...arrays) {
+  _.intersection = (...arrays) => {
     for (let i = 1; i < arrays.length; i++) {
       const temp = [];
 
